@@ -55,7 +55,6 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
         $stat = stat($this->logFile);
 
-        $stat = stat($this->logFile);
         $this->lastTime = $stat[STAT_TIME_LAST_MODIFICATION];
         $this->lastSize = $stat[STAT_FILE_SIZE];
 
@@ -78,7 +77,7 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
         {
             $variation = $newSize - $this->lastSize;
 
-            $command   = 'tail -c  ' . $variation . ' "' . $this->readFile . '"';
+            $command   = 'tail -c  ' . $variation . ' "' . $this->logFile . '"';
 
             $shell = shell_exec($command);
             $rows  = explode("\n", $shell);
@@ -111,7 +110,7 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
         if (empty ($line))
             return;
 
-        foreach($this->channels as $channel) 
+        foreach ($this->channels as $channel) 
         {            
             $this->bot->executeCommand($this->bot->getNick(), $this->command, array ($channel, $line));
         }
