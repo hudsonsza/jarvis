@@ -45,13 +45,17 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
         $this->setCommand('Say');
     }
 
+    public function __toString() {
+        return __CLASS__;
+    }
+
     public function start() {
         if (!file_exists($this->logFile))
             throw new Exception ('File ' . $this->logFile .' don\'t exists');
 
         $stat = stat($this->logFile);
 
-        $stat = stat($this->logFile)
+        $stat = stat($this->logFile);
         $this->lastTime = $stat[STAT_TIME_LAST_MODIFICATION];
         $this->lastSize = $stat[STAT_FILE_SIZE];
 

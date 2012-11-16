@@ -19,8 +19,18 @@
     ini_set( 'display_errors', 'on' );
 
     // Make autoload working
-    require 'ircbot/Classes/Autoloader.php';
-    spl_autoload_register( 'Autoloader::load' );
+    require 'IRC-Bot/Classes/Autoloader.php';
+    
+    spl_autoload_register(function ($class) {
+
+        $filename = str_replace( '\\', '/', $class ) . '.php';
+
+        if (file_exists($filename)) {
+            return require $filename;
+        }
+
+        Autoloader::load($class);
+    });
 
     // Create the bot.
     $bot = new Library\IRC\Bot();
@@ -29,8 +39,8 @@
     $bot->setServer( 'irc.gendoc.com.br' );
     $bot->setPort( 6667 );
     $bot->setChannel( array('#gendoc') );
-    $bot->setName( 'Jarvis' );
-    $bot->setNick( 'Jarvis' );
+    $bot->setName( 'Jarvis Beta' );
+    $bot->setNick( 'JarvisBeta' );
     $bot->setMaxReconnects( 1 );
     $bot->setLogFile( '/home/porkaria/codigo/log/ionews_sergipe/error_log' );
 
@@ -42,6 +52,12 @@
     $bot->addCommand( new Command\Timeout );
     $bot->addCommand( new Command\Quit );
     $bot->addCommand( new Command\Restart );
+
+    $service = new Service\Gendoc\ReadLogService('/home/porkaria/codigo/log/ionews_sergipe/error_log');
+    $service->setChannels = array('#gendoc');
+
+    $bot->addService($service);
+
 
     // Connect to the server.
     $bot->connectToServer();
