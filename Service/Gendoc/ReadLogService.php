@@ -43,9 +43,10 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
     public function start() {
         if (!file_exists($this->logFile))
-            thrown new Exception ('File ' . $this->logFile .' don\'t exists');
+            throw new Exception ('File ' . $this->logFile .' don\'t exists');
 
-        $stat = stat($this->logFile)
+        $stat = stat($this->logFile);
+
         $this->lastTime = $stat[9];
         $this->lastSize = $stat[7];
 
