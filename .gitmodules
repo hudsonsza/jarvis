@@ -1,3 +1,0 @@
-[submodule "ircbot"]
-	path = ircbot
-	url = git://github.com/porkaria/IRC-Bot.git
