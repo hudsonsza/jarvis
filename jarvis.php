@@ -42,7 +42,7 @@
     $bot->setName( 'Jarvis Beta' );
     $bot->setNick( 'JarvisBeta' );
     $bot->setMaxReconnects( 1 );
-    $bot->setLogFile( '/home/porkaria/codigo/log/ionews_sergipe/error_log' );
+    $bot->setLogFile( '/home/porkaria/codigo/log/jarvis/log' );
 
     // Add commands to the bot.
     $bot->addCommand( new Command\Say );
