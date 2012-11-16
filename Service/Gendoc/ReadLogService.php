@@ -20,7 +20,11 @@
 
 namespace Service\Gendoc;
 
+define ('STAT_TIME_LAST_MODIFICATION', 9);
+define ('STAT_FILE_SIZE', 7);
+
 class ReadLogService extends \Library\IRC\Service\ServiceBase {
+
 
     private /* string */ $logFile;
 
@@ -36,7 +40,7 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
 
     public function __construct($logFile) {
-        $this->logFile = $logFile;
+        $this->logFile = escapeshellcmd ($logFile);
 
         $this->setCommand('Say');
     }
@@ -47,8 +51,9 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
         $stat = stat($this->logFile);
 
-        $this->lastTime = $stat[9];
-        $this->lastSize = $stat[7];
+        $stat = stat($this->logFile)
+        $this->lastTime = $stat[STAT_TIME_LAST_MODIFICATION];
+        $this->lastSize = $stat[STAT_FILE_SIZE];
 
         $this->started = true;
     }
@@ -62,12 +67,13 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
         $stat = stat($this->logFile);    
 
-        $newTime   = $stat[9];
-        $newSize   = $stat[7];
+        $newTime   = $stat[STAT_TIME_LAST_MODIFICATION];
+        $newSize   = $stat[STAT_FILE_SIZE];
 
-        if ($this->lastStatus[9] != $newTime[9])
+        if ($this->lastTime != $newTime && $this->lastSize < $newSize)
         {
             $variation = $newSize - $this->lastSize;
+
             $command   = 'tail -c  ' . $variation . ' "' . $this->readFile . '"';
 
             $shell = shell_exec($command);
@@ -91,6 +97,9 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
                     $this->executeCommands ($row);
             }
         }
+
+        $this->lastTime = $newTime;
+        $this->lastSize = $newSize;
     }
 
     private function executeCommands($line) 
