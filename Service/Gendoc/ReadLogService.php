@@ -65,6 +65,37 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
         $this->started = false;
     }
 
+    /**
+     * Le os ultimos n bytes do arquivo de log e retorna
+     * 
+     * @param integer $bytes - nro de bytes a serem lidos
+     *
+     * @return string contendo os ultimos n bytes do arquivo de log
+     *
+     * @throw Exception caso na consiga abrir o arquivo de log
+     *
+     */
+    private function readLastBytes ($bytes) {
+
+        if (!is_readable($this->logFile))
+            throw new Exception($this->logFile . ' isn\'t readable');
+            
+        $fp = fopen ($this->logFile, 'r');
+
+        /* falha ao abrir o arquivo */
+        if (!$fp) {
+            throw new Exception ('Error opening ' . $this->logFile);
+        }
+
+        fseek ($fp, $this->lastSize);
+
+        $content = fread ($fp, $bytes);
+
+        fclose ($fp);
+
+        return $content;
+    }
+
     public function consume () {
         clearstatcache();
 
@@ -75,14 +106,16 @@ class ReadLogService extends \Library\IRC\Service\ServiceBase {
 
         if ($this->lastTime != $newTime && $this->lastSize < $newSize)
         {
+            /* calcula a quantidade de bytes a serem lidos */
             $variation = $newSize - $this->lastSize;
 
-            $command   = 'tail -c  ' . $variation . ' "' . $this->logFile . '"';
+            /* le os bytes */
+            $content = $this->readLastBytes ($variation);
 
-            $shell = shell_exec($command);
-            $rows  = explode("\n", $shell);
+            /* divide em linhas */
+            $rows = explode("\n", $content);
 
-            foreach ($rows as $row) 
+            foreach ($rows as $row)
             {
                 if (!empty($this->filters))
                 {
